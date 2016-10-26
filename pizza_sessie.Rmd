@@ -1,0 +1,118 @@
+---
+title: "Collinearity and PCA"
+author: "Joris Penders, Edwin Thoen"
+date: "4 Oct 2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+wine <- read.table('~/Desktop/wine.txt', header = TRUE) %>% as_data_frame
+```
+
+## Regression
+
+We all know about least squares regression, we have a quantitative output and one ore more inputs. We would write the predicted value for case $i$ when there are $p$ features as:
+
+$$
+\hat{y_i} = \beta_0 + \Sigma_{j = 1}^{p} \beta_j x_{ij}
+$$
+
+```{r ols, fig.width=7.5, fig.height=3.5, echo = FALSE}
+ggplot(mtcars, aes(wt, disp)) + 
+  geom_point() +
+  xlab('') +
+  ylab('') +
+  stat_smooth(method = 'lm', se = FALSE)
+```
+
+## Matrix notation
+Since this is a linear combination of the inputs we can rewrite it conveniently or all cases to:
+
+$$
+\bf\hat{y} = \bf{X}\bf{\beta}
+$$
+
+Where $\bf\hat{y}$ is a vector with predictions, $\bf{X}$ is a matrix with each row the observations of one case and each column the values of a feature (with columns of 1's), and $\bf{\beta}$ a vector wiht weights.
+
+## Least squares
+
+The loss we want to minimize, is called the residual sum of squares of the estimates. In matrix notation it is:
+
+$$
+RSS(\bf{\beta}) = (\bf{y} - \bf{X}\bf{\beta})^T (\bf{y} - \bf{X}\bf{\beta})
+$$
+
+We want to minimize this for $\bf{\beta}$, so we need to take the derivative w.r.t. $\bf{\beta}$ and set it to 0.
+
+This yields:
+
+$$
+\bf{\hat{\beta} = (X^TX)^{-1} X^Ty}
+$$
+
+## Perfect multicollinearity
+
+So we are looking for a $p$-dimensional hyperplane that minimizes the $RSS$ for the $p$ features w.r.t. $\bf{y}$.
+
+What would happen if we mistakingly put two versions of the same feature in the model?
+
+$$
+\bf{\hat{\beta} = (X^TX)^{-1} X^Ty}
+$$
+
+
+## Perfect multicollinearity
+
+```{r perfect_mc, echo = TRUE}
+x <- mtcars %>% mutate(cyl2 = 2*cyl) %>%  select(mpg, cyl, cyl2)
+lm(mpg ~ ., data = x)
+```
+
+`lm` removes perfectly correlated features, but if it didn't we were unable to find a solution.
+
+## High correlation
+
+We rarely have perfect multicollinearity (singular $\bf{X}$ matrix), however often we do have many correlated features.
+
+```{r wines, echo = TRUE, message=FALSE, fig.width=7.5, fig.height=3}
+wine_cor <- wine %>% select(-class) %>% cor %>% round(2)
+data.frame(cors = wine_cor[upper.tri(wine_cor)]) %>% 
+  ggplot(aes(cors)) + 
+  geom_histogram(fill = 'cornflowerblue', col = 'black')
+```
+
+## High correlation
+
+Although the parameters can be estimated, the correlations impact the estimates.
+
+```{r, echo = TRUE}
+set.seed(1234)
+x1 <- rnorm(100)
+x2 <- x1 + rnorm(100, 0, .5)
+cor(x1, x2)
+y <- x1 + x2 + rnorm(100)
+```
+## High correlation
+```{r}
+lm(y ~ x1, data.frame(x1, y))$coefficients
+lm(y ~ x2, data.frame(x2, y))$coefficients
+lm(y ~ ., data.frame(x1, x2, y))$coefficients
+
+```
+
+## Just take another sample 
+
+```{r, echo = TRUE}
+set.seed(2345)
+x1 <- rnorm(100)
+x2 <- x1 + rnorm(100, 0, .5)
+y <- x1 + x2 + rnorm(100)
+lm(y ~ ., data.frame(x1, x2, y))$coefficients
+```
+
+We are going to explore this further in **Lab 1**.
+
+
+
