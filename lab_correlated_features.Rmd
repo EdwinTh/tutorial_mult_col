@@ -37,7 +37,7 @@ We are trying to sample from a distribution with a correlation bigger than 1. In
 
 1.4 Build a function that 
 
-a) samples 1000 cases from a standard multivariate normal with two featuer, with the correlation as parameter.
+a) samples 1000 cases from a standard multivariate normal with two features, with the correlation as parameter.
    (hence when x1 and x2 are standardnormally distributed their covariance is also the correlation)
 b) creates y as in the slides.
 c) regresses y on x1 and x2 and return the three coeffictients.
@@ -65,13 +65,13 @@ for(i in 1:length(rho_grid)) {
 result_df <- do.call('rbind', results)
 ```
 
-1.6 For further analysis it is helpful to place this in long format with three columns, the rho value, the parameter name and the estimate.
+1.6 For further analysis it is helpful to place this in long format with three columns, the rho value, the parameter name and the estimate. This could be done with `tidyr::gather`
 
 ```{r}
 result_long <- gather(result_df, key = parameter, value = estimate, -rho_value)
 ```
 
-1.7 Now compare the different row values by calculating statistics. What do you expect in terms of bias and variance of the estimates? If you prefer analyze the statistics grahpically.
+1.7 Now compare the different row values by calculating statistics. What do you expect in terms of bias and variance of the estimates? If you prefer analyze the statistics grahpically. What is you conclusion?
 
 ```{r}
 stats <- result_long %>% group_by(rho_value, parameter) %>% 
@@ -84,9 +84,16 @@ stats <- result_long %>% group_by(rho_value, parameter) %>%
 ggplot(stats, aes(rho_value, val)) + 
   geom_point(aes(col = stat)) +
   geom_line(aes(col = stat)) + 
-  facet_wrap(~parameter)
-  
+  facet_wrap(~parameter) +
+  xlab(expression(rho)) +
+  ylab('estimate')
 ```
 
+The average of the estimates remains 1 for the two parameters, indicating that no matter how high the correlation between the two features, the estimates remain unbiased. However we see min, max and standard deviation increase rapidly as rho gets larger. From 0.5 onwards the variance in the estimates increases, giving us greater uncertainty about the influence of the parameter.
 
+1.8 What do you expect from the correlation between the estimates of beta 1 and beta 2?
+
+```{r}
+result_df %>% group_by(rho_value) %>% summarise(cor_est = cor(V1, V2))
+```
 

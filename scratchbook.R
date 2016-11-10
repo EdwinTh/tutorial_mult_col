@@ -1,9 +1,9 @@
-data(wine) 
+library(HDclassif)
 library(dplyr)
-
+data(wine)
 colnames(wine)[2:14] <- c('alcohol', 'malic_acid', 'ash', 'alcalinity', 'magnesium', 'phenosis', 'flavanoids', 'phenols', 'proanthocyanins', 'color', 'hue', 'diluted', 'proline')
 
-write.table(wine, '~/Desktop/wine.txt', row.names = F, quote = F)
+write.csv(wine, './wine.csv', row.names = F, quote = F)
 
 wine <- wine %>% as.tbl
 
@@ -83,3 +83,14 @@ mod <- cv.glmnet(X, y, family = 'binomial')
 glmnet(X, y, family = 'binomial', lambda = mod$lambda.1se)$beta
 
 
+# stats is from lab1 last exercise
+plot <- ggplot(stats, aes(rho_value, val)) + 
+  geom_point(aes(col = stat)) +
+  geom_line(aes(col = stat)) + 
+  facet_wrap(~parameter) +
+  xlab(expression(rho)) +
+  ylab('estimate')
+
+pdf('./stats_plot.pdf', height = 4, width = 7)
+plot
+dev.off()

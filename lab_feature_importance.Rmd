@@ -1,0 +1,52 @@
+---
+title: "Lab feature importance"
+output: html_document
+---
+
+We have explored the relationship between feature and target graphically, now we are going to measure it.
+
+The deviance of a statistical model is comuted in the following way: -2 (LL(model) - LL(saturated model)). Where the saturated model has a perfect fit, with a parameter for each observation. The null deviance is the deviance for an intercept-only model. The deviance reduction is the proportional difference between a the model deviance and the null deviance. It has a similar meaning as the R squared, amount of variance explained by the model.
+
+2.1 Fit a logistic regression model on a data set and obtain the deviance and null.deviance from it.
+
+```{r}
+mod <- glm(vs ~ cyl, data = mtcars, family = 'binomial')
+mod$null.deviance
+mod$deviance
+```
+
+2.2 `glm` is a convenience wrapper over `glm.fit`, it allows you to feed it with a data frame, it will automatically add a column for the intercept and it gives the formula option so you can specify exactly what features to use. `glm.fit` however is easier to program with. Write a wrapper function that takes a data frame as input, adds a column ones for the intercept and saves it as a matix. Save the class column in a vector. Then use `glm.fit` to obtain the deviance reduction.
+
+```{r}
+# X = a data frame of one or more features
+dev_reduction <- function(X){
+  X_mat <- cbind(1, X) %>% as.matrix
+  y <- wine$class
+  mod <- glm.fit(X_mat, y, family = binomial())
+  1 - mod$deviance / mod$null.deviance
+}
+```
+
+2.3 Apply this function to all the features of the wine data set. and save in a data frame.
+
+```{r}
+dev_red <- wine %>% select(-class) %>% sapply(dev_reduction)
+dev_red_df <- data.frame(var = names(dev_red), dev_red = dev_red)
+```
+
+2.4 The object with relative information of the boosted model, shown in the slides, is saved in relative_information.Rdata (the object it loads is called rel_inf. Load it, join it to the data frame with deviance reduction and make a plot comparing the two.  
+
+```{r}
+load('./relative_information.Rdata')
+full_join(dev_red_df, rel_inf) %>% 
+  gather(measure, value, -var) %>% 
+  ggplot(aes(var, value)) + 
+  geom_bar(aes(fill = measure), stat = 'identity', position = 'dodge') +
+  coord_flip()
+```
+
+2.5 Can you explain the relative information being higher than the deviance reduction for proline ?
+
+Answer: deviance reduction is a linear measuere, boosted trees fit nonlinear relationships. For completeness we could also check nonlinear univariate relations, for instance by allowing for polynomials in the glm.
+
+

@@ -6,10 +6,14 @@ output: ioslides_presentation
 ---
 
 ```{r setup, include=FALSE}
-library(ggplot2)
-library(dplyr)
-wine <- read.table('~/Desktop/wine.txt', header = TRUE) %>% as_data_frame
+library(tidyverse)
+wine <- read.table('./wine.txt', header = TRUE) %>% as_data_frame
 ```
+
+## Part 1
+
+### Estimating regression parameters from correlated features
+
 
 ## Regression
 
@@ -114,5 +118,100 @@ lm(y ~ ., data.frame(x1, x2, y))$coefficients
 
 We are going to explore this further in **Lab 1**.
 
+## Results lab 1
+<img src="stats_plot.pdf" alt="Drawing"  style="width: 800px;"/>
 
+## Part 2
+
+### Feature interpretation
+
+## Machine Learning
+
+Effects can not bet disentangled. Does this matter?
+
+- for prediction? No, as long as predictions are accurate.
+- for interpretation? Yes, we can't report the individual effects.
+
+Note that variance of the parameter estimates is different from variance in prediction function.
+
+Former is thus caused by correlated features, latter by too few data points for the complexity we want to model.
+
+## What if interpretation matters?
+
+Just gathering lots of data points on many features in an algorithm might get the job done.
+
+But often we are looking for understanding as well as accurate predictions:
+
+- Leads to better models (what can we do to improve?)
+- Better explanation to business
+- Justification to outside world (regulators)
+- Reduces algorithm-anxiety at customers
+
+## How to get understanding?
+
+We can get the variable importance explicitly from regularized regression, or implicitly with feature importance.
+
+This is often what we report, but it only shows feature importance in the model.
+
+Besides, we can look at univariate relationships between fearures and targets:
+
+- linear: correlation, R sq. of univariate regression.
+- nonlinear: correlation, R sq. of transformations, gini, prediction stats with ml methods.
+
+## Wine example: boosting
+```{r, cache = TRUE,  fig.width=7.5, fig.height=3.5, warning = FALSE}
+wine <- read.csv('./wine.csv')
+wine$class <- as.numeric(wine$class == 1)
+boosted_tree <- gbm::gbm(class ~ ., data = wine, n.trees = 1000, 
+        interaction.depth = 2, cv.folds = 5, distribution = 'bernoulli')
+data.frame(y_scale = boosted_tree$cv.fitted, class = factor(wine$class)) %>% 
+  ggplot(aes(y_scale)) + geom_density(aes(fill = class), alpha = .5)  
+```
+
+## Relative information from `gbm`
+
+```{r, eval= FALSE, include = FALSE}
+rel_inf <- summary(boosted_tree) %>% 
+  mutate(rel_inf = rel.inf / 100) %>% select(-rel.inf)
+save(rel_inf, file = './relative_information.Rdata')
+```
+
+```{r}
+load('./relative_information.Rdata')
+ggplot(rel_inf, aes(var, rel_inf)) + 
+  geom_bar(stat = 'identity') + coord_flip()
+```
+
+
+## Univariate predictive value
+
+```{r}
+graphic_univariate <- 
+  gather(wine, feature, value, -class) %>% 
+  mutate(class = factor(class)) %>% 
+  group_by(feature) %>% 
+  mutate(z_value = scale(value)) %>% 
+  ggplot(aes(z_value)) + 
+  geom_density(aes(fill = class), alpha = 0.5) +
+  facet_wrap(~feature, scale = 'free_y')
+```
+
+## Univariate predictive value
+
+```{r}
+graphic_univariate
+```
+
+
+## Correlation among features
+
+```{r}
+library(corrplot); wine %>% select(-class) %>% cor %>% corrplot(method = 'square')
+```
+
+## Using a biplot to see which features obscures which
+
+```{r}
+princomp(wine %>% select(-class) %>% apply(2, scale)) %>% biplot
+```
 
