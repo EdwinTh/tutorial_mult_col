@@ -1,5 +1,6 @@
 ---
-title: "Collinearity and PCA"
+title: "Correlated features"
+subtitle: "With labs in R"
 author: "Joris Penders, Edwin Thoen"
 date: "4 Oct 2016"
 output: ioslides_presentation
@@ -209,9 +210,69 @@ graphic_univariate
 library(corrplot); wine %>% select(-class) %>% cor %>% corrplot(method = 'square')
 ```
 
-## Using a biplot to see which features obscures which
+## Part 3
 
-```{r}
-princomp(wine %>% select(-class) %>% apply(2, scale)) %>% biplot
+Dimension reduction with PCA
+
+## PCA
+
+A principal components fits *q* vectors in the *p*-dimensional feature space. Where *q* is the rank of *p*.
+
+Mathematically quite involved, lets look at the intuition.
+
+Component 1: the vector in *p*-dimensional space that explains most of the variance in the features.
+
+Further components: the vector that explains most of the remaining variance and is orthogonal to previous components.
+
+So amount of variance explained is by definition diminishing over the components.
+
+
+## PCA visual
+
+Fitting two components to three features:
+
+<img src="pca_fig.png" alt="Drawing"  style="width: 800px;"/>
+
+## Number of components
+
+The higher the correlations among the features, the less components we need to explain nearly all the variance.
+
+Rule of thumb for number of components, look for the elbow in the "scree plot".
+
+```{r,fig.width=7.5, fig.height=3.5, echo = FALSE}
+pca_mtcars <- mtcars %>% apply(2, scale) %>%  prcomp
+broom::tidy(pca_mtcars, "pcs") %>% 
+  ggplot(aes(PC, percent)) +
+  geom_bar(stat = 'identity', fill = 'cornflowerblue', col = 'black') +
+  ylab('Variance explained') + 
+  scale_x_continuous(breaks = 1:11,
+        labels = 1:11)
 ```
 
+## Keep in mind
+
+* Tries to explain as much absolute variacne, so all features should be at the same scale.
+
+* Like correlation, it compresses **linear** relationships, nonlinear alternatives are available.
+
+## Interpreting the PCs
+
+Look at the loadings of the features on the components.
+
+```{r, fig.height = 3}
+pca_mtcars <- mtcars %>% apply(2, scale) %>% prcomp
+pca_mtcars$rotation[, 1:4]
+```
+
+
+## Biplot
+
+Both the features and the cases have a score on the PCs, the features have the loading, the cases the projections. Visualising them together can be very insighful.
+
+```{r, echo = FALSE}
+pca_mtcars %>% biplot
+```
+
+## That's all
+
+Go on to the final lab.

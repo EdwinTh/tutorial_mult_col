@@ -2,10 +2,16 @@
 title: "Lab feature importance"
 output: html_document
 ---
+```{r}
+library(tidyverse)
+library(dplyr)
+wine <- read.table('./wine.txt', header = TRUE)
+wine$class <- as.numeric(wine$class == 1)
+```
 
 We have explored the relationship between feature and target graphically, now we are going to measure it.
 
-The deviance of a statistical model is comuted in the following way: -2 (LL(model) - LL(saturated model)). Where the saturated model has a perfect fit, with a parameter for each observation. The null deviance is the deviance for an intercept-only model. The deviance reduction is the proportional difference between a the model deviance and the null deviance. It has a similar meaning as the R squared, amount of variance explained by the model.
+The deviance of a statistical model is comuted in the following way: -2 (LL(model) - LL(saturated model)). Where the saturated model has a perfect fit, with a parameter for each observation. The null deviance is the deviance for an intercept-only model. The deviance reduction is the proportional difference between the model deviance and the null deviance. It has a similar meaning as the R squared, amount of variance explained by the model.
 
 2.1 Fit a logistic regression model on a data set and obtain the deviance and null.deviance from it.
 
@@ -15,7 +21,7 @@ mod$null.deviance
 mod$deviance
 ```
 
-2.2 `glm` is a convenience wrapper over `glm.fit`, it allows you to feed it with a data frame, it will automatically add a column for the intercept and it gives the formula option so you can specify exactly what features to use. `glm.fit` however is easier to program with. Write a wrapper function that takes a data frame as input, adds a column ones for the intercept and saves it as a matix. Save the class column in a vector. Then use `glm.fit` to obtain the deviance reduction.
+2.2 `glm` is a convenience wrapper over `glm.fit`, it allows you to feed it with a data frame, it will automatically add a column for the intercept and it gives the formula option so you can specify exactly what features to use. `glm.fit` however is easier to program with. Write a wrapper function that takes a data frame as input, adds a column ones for the intercept and saves it as a matrix. Save the class column in a vector. Then use `glm.fit` to obtain the deviance reduction.
 
 ```{r}
 # X = a data frame of one or more features
@@ -27,10 +33,10 @@ dev_reduction <- function(X){
 }
 ```
 
-2.3 Apply this function to all the features of the wine data set. and save in a data frame.
+2.3 Apply this function to all the features of the wine data set, and save in a data frame. Use either a `for` loop or `sapply`
 
 ```{r}
-dev_red <- wine %>% select(-class) %>% sapply(dev_reduction)
+dev_red <- wine %>% dplyr::select(-class) %>% sapply(dev_reduction)
 dev_red_df <- data.frame(var = names(dev_red), dev_red = dev_red)
 ```
 

@@ -1,0 +1,91 @@
+---
+title: "Lab correlated features - Solution"
+output: html_document
+---
+
+So we saw quite different estimates when resampling x1 and x2 only once. To get a feel for the impact of correlation between features we are going to do some resampling. 
+
+
+1.1 Install the `MASS` and `tidyverse` libraries if you haven't done so and load them.
+
+```{r, message=FALSE}
+library(MASS)
+library(tidyverse)
+```
+
+`MASS` contains the `mvrnorm` function that allows sampling from a multivariate normal distribution. x1 and x2 are multivariately distributed with the vector mu as theirs respective means and the covariance matrix Sigma with the variances on the diagonal and the covariance on the offdiagonal.
+
+1.2 Play around with the `mvrnorm` function in the `MASS` package.
+
+```{r}
+?mvrnorm
+mvrnorm(100, c(10, 20), matrix(c(5, 3, 3, 10), nrow = 2))  %>% cor
+mvrnorm(100, c(10, 20), matrix(c(5, 6, 6, 10), nrow = 2))  %>% cor
+```
+
+Did you happen to try sampling from a distribution at which the covariances are large compared to the variances?
+
+1.3 If not do so and explain what is happening?
+
+```{r}
+# mvrnorm(100, c(0, 0), matrix(c(2, 3, 3, 2), nrow = 2))
+```
+
+
+
+1.4 Build a function that 
+
+a) samples 1000 cases from a standard multivariate normal with two features, with the correlation as parameter.
+   (hence when x1 and x2 are standardnormally distributed their covariance is also the correlation)
+b) creates y as in the slides.
+c) regresses y on x1 and x2 and return the three coeffictients.
+
+```{r}
+get_estimates <- function(rho = 0) {
+  # step a
+  X <- mvrnorm(1000, rep(0, 2), matrix(c(1, rho, rho, 1), nrow = 2)) 
+  # step b
+  your_code_here
+  # step c
+  your_code_here
+}
+```
+
+1.5 Now apply this function on a grid between 0 and 1, with step size .1. Do a 100 repetitions for each of the correlation values. Collect the results in a 1100 x 4 data frame, with a column indicating the rho value added.
+
+Before doing the analysis, what do you expect from rho = 1? Why might it be more insightful to take .99 instead?
+
+```{r}
+rho_grid <- your_code_here
+results  <- vector('list', length(rho_grid)) 
+for(i in 1:length(rho_grid)) {
+  ?replicate
+  results[[i]] <- your_code_here 
+}
+result_df <- do.call('rbind', results)
+```
+
+1.6 For further analysis it is helpful to place this in long format with three columns, the rho value, the parameter name and the estimate. This could be done with `tidyr::gather`
+
+```{r}
+result_long <- gather(result_df, key = your_code_here, value = your_code_here, -your_code_here)
+```
+
+1.7 Now compare the different row values by calculating statistics. What do you expect in terms of bias and variance of the estimates? If you prefer analyze the statistics grahpically. What is you conclusion?
+
+```{r}
+stats <- result_long %>% group_by( your_code_here ) %>% 
+  summarise( your_code_here ) %>% 
+  gather( your_code_here)
+
+
+```
+
+The average of the estimates remains 1 for the two parameters, indicating that no matter how high the correlation between the two features, the estimates remain unbiased. However we see min, max and standard deviation increase rapidly as rho gets larger. From 0.5 onwards the variance in the estimates increases, giving us greater uncertainty about the influence of the parameter.
+
+1.8 What do you expect from the correlation between the estimates of beta 1 and beta 2?
+
+```{r}
+result_df %>% group_by( your_code_here ) %>% summarise( your_code_here )
+```
+

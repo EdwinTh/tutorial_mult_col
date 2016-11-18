@@ -1,0 +1,85 @@
+---
+title: "Lab PCA"
+output: html_document
+---
+
+```{r, message = FALSE}
+library(tidyverse)
+wine <- read.table('./wine.txt')
+```
+
+We have noted high correlation in the wines data set, causing some of the features to have zero influence in the overal models. When we look at the correlation matrix on the slide we see some very high correlations. 
+
+3.1 Make a list of the 10 ten highest correlations. It does not matter if these are positive or negative.
+
+```{r}
+wine <- read.csv('./wine.csv')
+cor_df <- wine %>% select(-class) %>% cor %>% abs %>% as.data.frame
+cor_df$feature1 <- colnames(cor_df)
+gather(cor_df, key = feature2, value = cor, -feature1) %>% 
+  filter(feature1 != feature2) %>% arrange(-cor) %>% 
+  filter(!duplicated(cor)) %>% head(10)
+```
+
+The first three correlations show a nice triangle between flavanoids, phenosis, and diluted. This kind of multivariate correlations are observed often in multicollinear feature sets. 
+
+3.2 Fit a PCA to the data set, don't forget to remove the class and to ....
+
+```{r}
+wine_pca <- wine %>% select(-class) %>% apply(2, scale) %>% 
+  prcomp
+```
+
+R is notorious for the non-tidy data that is in model objects. If you want to get data from a model object you could do `names(obj_name)` to see what elements there are in the object. Recently `broom` is introduced, you could use `augment` and `tidy` from this package in the following exercises.
+
+3.3 Build a scree plot to see how many relevant components we have. (use `broom::tidy`)
+
+```{r}
+library(broom)
+?augment.prcomp
+tidy(wine_pca, 'pcs') %>% 
+  ggplot(aes(PC, percent)) +
+  geom_bar(stat = 'identity', fill = 'cornflowerblue', col = 'black') +
+  ylab('Variance explained') + 
+  scale_x_continuous(breaks = 1:13,
+        labels = 1:13)
+```
+
+Can we explain all the variation by the first two pc's? Compare to the scree plot in the slides on mtcars.
+
+3.4 Irrespective of your conclusions create a biplot of the first two. You could be done in two minutes with the `biplot` function, but if you feel like hacking you could build a function that creates the biplot with the components to visualize as a parameterd.
+
+```{r}
+biplot(wine_pca)
+```
+
+```{r}
+gg_biplot <- function(pca_object, 
+                      components = c(1, 2)){
+  stopifnot( class(pca_object) == 'prcomp' )
+  loadings <- pca_object$rotation[,components] %>% 
+    as.data.frame %>% mutate(features = rownames(.)) %>% 
+    mutate(origin = 0) # this to help the segment
+  cols <- colnames(loadings)
+  
+  plot <- ggplot(loadings, aes_string(cols[1], cols[2])) +
+    geom_text(aes(label = features)) +
+    geom_segment(aes_string(x = 'origin', y = 'origin', xend = cols[1], yend = cols[2]),
+                 arrow = arrow(length = unit(0.5, "cm")), color = 'red')
+    
+  cases <- pca_object$x[,components] %>% as.data.frame
+  
+  loadings_max   <- loadings[ ,1:2] %>% apply(2, range) %>% abs %>% max
+  projections_max <- cases %>% abs %>% max
+  
+  cases <- (cases * (loadings_max / projections_max)) %>% mutate(nr = 1:nrow(cases))
+  # scale the cases so the fit into the plot neatly
+ 
+  plot +
+    geom_text(data = cases, aes(label = nr))
+}
+
+gg_biplot(wine_pca, c(1,2))
+```
+
+Try to interpret the biplot and get a feel for it. Play around with the lower components with the function (if you don't manage to complete it, just copy the one from the solution), what do you see when you go down?
