@@ -31,7 +31,7 @@ Did you happen to try sampling from a distribution at which the covariances are 
 # mvrnorm(100, c(0, 0), matrix(c(2, 3, 3, 2), nrow = 2))
 ```
 
-We are trying to sample from a distribution with a correlation bigger than 1. In the case of just two variables this is pretty obvious, but with multiple variables Sigma is also singular with lower correlations. This has a close relation with estimating regression coefficients. Even though the individual correlations are moderately high there are perfect combinations within the feature matrix. Besides a correlation analysis it also a good idea to do a PCA before fitting any model to observational data.
+At 1.3 we are trying to sample from a distribution with a correlation bigger than 1. In the case of just two variables this is pretty obvious, but with multiple variables Sigma can also be singular with lower correlations. This has a close relation with estimating regression coefficients. Even though the individual correlations are moderately high there are perfect combinations within the feature matrix. Besides a correlation analysis it also a good idea to do a PCA before fitting any model to observational data.
 
 1.4 Build a function that 
 

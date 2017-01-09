@@ -81,7 +81,7 @@ stats <- result_long %>% group_by( your_code_here ) %>%
 
 ```
 
-The average of the estimates remains 1 for the two parameters, indicating that no matter how high the correlation between the two features, the estimates remain unbiased. However we see min, max and standard deviation increase rapidly as rho gets larger. From 0.5 onwards the variance in the estimates increases, giving us greater uncertainty about the influence of the parameter.
+At 1.3 we are trying to sample from a distribution with a correlation bigger than 1. In the case of just two variables this is pretty obvious, but with multiple variables Sigma can also be singular with lower correlations. This has a close relation with estimating regression coefficients. Even though the individual correlations are moderately high there are perfect combinations within the feature matrix. Besides a correlation analysis it also a good idea to do a PCA before fitting any model to observational data.
 
 1.8 What do you expect from the correlation between the estimates of beta 1 and beta 2?
 

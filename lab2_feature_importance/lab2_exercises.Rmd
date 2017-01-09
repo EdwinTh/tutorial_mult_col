@@ -5,13 +5,12 @@ output: html_document
 
 ```{r}
 library(tidyverse)
-library(dplyr)
 wine <- read.table('./wine.txt', header = TRUE)
 wine$class <- as.numeric(wine$class == 1)
 ```
 We have explored the relationship between feature and target graphically, now we are going to measure it.
 
-The deviance of a statistical model is comuted in the following way: -2 (LL(model) - LL(saturated model)). Where the saturated model has a perfect fit, with a parameter for each observation. The null deviance is the deviance for an intercept-only model. The deviance reduction is the proportional difference between the model deviance and the null deviance. It has a similar meaning as the R squared, amount of variance explained by the model.
+The deviance of a statistical model is computed in the following way: -2 (LL(model) - LL(saturated model)). Where the saturated model has a perfect fit, with a parameter for each observation. The null deviance is the deviance for an intercept-only model. The deviance reduction is the proportional difference between the model deviance and the null deviance. It has a similar meaning as the R squared, amount of variance explained by the model.
 
 2.1 Fit a logistic regression model on a data set and obtain the deviance and null.deviance from it.
 
@@ -19,19 +18,26 @@ The deviance of a statistical model is comuted in the following way: -2 (LL(mode
 
 ```
 
-2.2 `glm` is a convenience wrapper over `glm.fit`, it allows you to feed it with a data frame, it will automatically add a column for the intercept and it gives the formula option so you can specify exactly what features to use. `glm.fit` however is easier to program with. Write a wrapper function that takes a data frame as input, adds a column ones for the intercept and saves it as a matrix. Save the class column in a vector. Then use `glm.fit` to obtain the deviance reduction.
+2.2 `glm` is a convenience wrapper over `glm.fit`, it allows you to feed it with a data frame, it will automatically add a column for the intercept and it gives the formula option so you can specify exactly what features to use. Moreover, it creates dummies from categorical variables. `glm.fit` however is easier to program with. 
+
+We are going to assess the individual deviance reduction for each of the features in the wine data set.
+Write a function that:
+  - takes a feature as parameter. 
+  - makes a n x 2 matrix with a columns of 1s and the feature.
+  - regress the wine class on the matrix with `glm.fit`.
+  - returns the deviance reduction.
 
 ```{r}
 
 ```
 
-2.3 Apply this function to all the features of the wine data set. and save in a data frame.
+2.3 Apply this function to all the features of the wine data set. Save in a data frame with two columns; the feature names and the deviance reduction. Use either a `for` loop or `sapply`
 
 ```{r}
 
 ```
 
-2.4 The object with relative information of the boosted model, shown in the slides, is saved in relative_information.Rdata (the object it loads is called rel_inf. Load it, join it to the data frame with deviance reduction and make a plot comparing the two.  
+2.4 The object with relative information of the boosted model, shown in the slides, is saved in relative_information.Rdata (the object it loads is called rel_inf). Load it, join it to the data frame with deviance reduction and make a plot comparing the two.  
 
 ```{r}
 load('./relative_information.Rdata')

@@ -5,7 +5,7 @@ output: html_document
 
 ```{r, message = FALSE}
 library(tidyverse)
-wine <- read.table('./wine.txt')
+wine <- read.table('./wine.txt', header = TRUE)
 ```
 
 We have noted high correlation in the wines data set, causing some of the features to have zero influence in the overal models. When we look at the correlation matrix on the slide we see some very high correlations. 
@@ -24,7 +24,7 @@ The first three correlations show a nice triangle between flavanoids, phenosis, 
 
 ```
 
-R is notorious for the non-tidy data that is in model objects. If you want to get data from a model object you could do `names(obj_name)` to see what elements there are in the object. Recently `broom` is introduced, you could use `augment` and `tidy` from this package in the following exercises.
+R is notorious for the non-tidy data that is returned in model objects. If you want to get data from a model object you could do `names(obj_name)` to see what elements there are in the object. Recently `broom` is introduced, you could use `augment` and `tidy` from this package in the following exercises.
 
 3.3 Build a scree plot to see how many relevant components we have. (use `broom::tidy`)
 
@@ -34,7 +34,7 @@ R is notorious for the non-tidy data that is in model objects. If you want to ge
 
 Can we explain all the variation by the first two pc's? Compare to the scree plot in the slides on mtcars.
 
-3.4 Irrespective of your conclusions create a biplot of the first two. You could be done in two minutes with the `biplot` function, but if you feel like hacking you could build a function that creates the biplot with the components to visualize as a parameterd.
+3.4 Irrespective of your conclusions create a biplot of the first two. You could be done in two seconds with the `biplot` function, but if you feel like hacking you could build a function that creates the biplot with the components to visualize as a parameter.
 
 ```{r}
 
