@@ -2,7 +2,7 @@
 title: "Correlated features"
 subtitle: "With labs in R"
 author: "Joris Penders, Edwin Thoen"
-date: "4 Oct 2016"
+date: "8 Jan 2017"
 output: ioslides_presentation
 ---
 
@@ -18,7 +18,7 @@ wine <- read.table('./wine.txt', header = TRUE) %>% as_data_frame
 
 ## Regression
 
-We all know about least squares regression, we have a quantitative output and one ore more inputs. We would write the predicted value for case $i$ when there are $p$ features as:
+We all know about least squares regression, we have a quantitative output and one or more inputs. We would write the predicted value for case $i$ when there are $p$ features as:
 
 $$
 \hat{y_i} = \beta_0 + \Sigma_{j = 1}^{p} \beta_j x_{ij}
@@ -33,13 +33,13 @@ ggplot(mtcars, aes(wt, disp)) +
 ```
 
 ## Matrix notation
-Since this is a linear combination of the inputs we can rewrite it conveniently or all cases to:
+Since this is a linear combination of the inputs we can rewrite it conveniently for all cases to:
 
 $$
 \bf\hat{y} = \bf{X}\bf{\beta}
 $$
 
-Where $\bf\hat{y}$ is a vector with predictions, $\bf{X}$ is a matrix with each row the observations of one case and each column the values of a feature (with columns of 1's), and $\bf{\beta}$ a vector wiht weights.
+Where $\bf\hat{y}$ is a vector with predictions, $\bf{X}$ is a matrix with each row the observations of one case and each column the values of a feature (with the first column being 1's), and $\bf{\beta}$ a vector with weights.
 
 ## Least squares
 
@@ -71,7 +71,7 @@ $$
 ## Perfect multicollinearity
 
 ```{r perfect_mc, echo = TRUE}
-x <- mtcars %>% mutate(cyl2 = 2*cyl) %>%  select(mpg, cyl, cyl2)
+x <- mtcars %>% mutate(cyl2 = 2*cyl) %>% select(mpg, cyl, cyl2)
 lm(mpg ~ ., data = x)
 ```
 
@@ -146,7 +146,7 @@ But often we are looking for understanding as well as accurate predictions:
 - Leads to better models (what can we do to improve?)
 - Better explanation to business
 - Justification to outside world (regulators)
-- Reduces algorithm-anxiety at customers
+- Reduces algorithm-anxiety of the customer
 
 ## How to get understanding?
 
