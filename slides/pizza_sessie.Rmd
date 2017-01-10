@@ -122,20 +122,22 @@ We are going to explore this further in **Lab 1**.
 ## Results lab 1
 <img src="stats_plot.pdf" alt="Drawing"  style="width: 800px;"/>
 
+## Results lab 1
+
+Note that variance of the parameter estimates is different from variance in prediction function.
+
+Former is thus caused by correlated features, latter by too few data points for the complexity we want to model.
+
 ## Part 2
 
 ### Feature interpretation
 
 ## Machine Learning
 
-Effects can not bet disentangled. Does this matter?
+Effects can not be disentangled. Does this matter?
 
 - for prediction? No, as long as predictions are accurate.
 - for interpretation? Yes, we can't report the individual effects.
-
-Note that variance of the parameter estimates is different from variance in prediction function.
-
-Former is thus caused by correlated features, latter by too few data points for the complexity we want to model.
 
 ## What if interpretation matters?
 
@@ -157,7 +159,7 @@ This is often what we report, but it only shows feature importance in the model.
 Besides, we can look at univariate relationships between fearures and targets:
 
 - linear: correlation, R sq. of univariate regression.
-- nonlinear: correlation, R sq. of transformations, gini, prediction stats with ml methods.
+- nonlinear: correlation, R sq. of transformations, prediction stats with ml methods.
 
 ## Wine example: boosting
 ```{r, cache = TRUE,  fig.width=7.5, fig.height=3.5, warning = FALSE}
